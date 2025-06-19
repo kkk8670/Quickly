@@ -1,9 +1,12 @@
+import 'tsconfig-paths/register'
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
+import { jobRoutes } from '@/modules/jobs/jobs.routes';
 
-const app = Fastify();
+const app = Fastify({ logger: true });
 
 app.register(cors);
+app.register(jobRoutes, { prefix: '/api' });
 
 // Basic test route
 app.get('/', async () => {

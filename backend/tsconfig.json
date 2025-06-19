@@ -6,8 +6,13 @@
         "esModuleInterop": true,
         "strict": true,
         "baseUrl": "./src",
+        "paths": {
+            "@/*": [
+                "*"
+            ]
+        },
         "outDir": "./dist",
-        "skipLibCheck": true
+        "skipLibCheck": true,
     },
     "include": [
         "next-env.d.ts",
