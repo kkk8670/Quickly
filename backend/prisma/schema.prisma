@@ -12,10 +12,10 @@ model Job {
   id           String   @id @default(uuid())
   type         JobType
   status       JobStatus   @default(PENDING)
-  title        String
+  title        String?
   description  String?
-  lat          Float
-  lng          Float
+  lat          Float?
+  lng          Float?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
