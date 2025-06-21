@@ -4,6 +4,7 @@
         "moduleResolution": "NodeNext",
         "target": "ES2022",
         "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
         "strict": true,
         "baseUrl": "./src",
         "paths": {
@@ -19,9 +20,12 @@
         "**/*.ts",
         "**/*.tsx",
         ".next/types/**/*.ts",
-        "types"
+        "plugins",
+        "src/**/*",
+        "types/**/*"
     ],
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "dist"
     ]
 }
