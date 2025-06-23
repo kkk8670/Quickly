@@ -12,5 +12,13 @@
   "keywords": [],
   "author": "Chloe",
   "license": "ISC",
-  "packageManager": "pnpm@10.12.1"
+  "packageManager": "pnpm@10.12.1",
+  "dependencies": {
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
+  },
+  "devDependencies": {
+    "@types/socket.io": "^3.0.1",
+    "tsx": "^4.20.3"
+  }
 }
