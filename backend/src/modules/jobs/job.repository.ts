@@ -1,7 +1,7 @@
 // modules/jobs/jobs.repository.ts
 import { prisma } from '@/lib/prisma.js'
 import { Job  } from '@prisma/client'
-import type { CreateJobDTO } from '@/types/job.js'
+import type { CreateJobDTO } from './job.schema.js'
 
 // insert db
 export const createJobInDB = async (input: CreateJobDTO): Promise<Job> => {

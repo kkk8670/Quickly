@@ -1,14 +1,8 @@
 // modules/jobs/jobs.controller.ts
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { createJob, getJobs } from './service.js'
-import type { CreateJobDTO } from '@/types/job.js'
-import { z } from 'zod';
-
-const CreateJobSchema = z.object({
-  type: z.enum(['QUICK_BOOK', 'POST_QUOTE']),
-  customerId: z.string(),
-  title: z.string(),
-});
+import { createJob, getJobs } from './job.service.js'
+import { CreateJobSchema } from './job.schema.js';
+ 
 
 // http post
 export const createJobHandler = async (req: FastifyRequest, res: FastifyReply) => {

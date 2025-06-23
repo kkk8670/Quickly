@@ -17,6 +17,7 @@ model Job {
   customerId   String?
   lat          Float?
   lng          Float?
+  bids         Bid[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -31,4 +32,14 @@ enum JobStatus {
   BOOKED
   COMPLETED
   CANCELLED
+}
+
+model Bid {
+  id        String   @id @default(uuid())
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  jobId     String
+  providerId String
+  amount    Float
+  message   String?
+  createdAt DateTime @default(now())
 }
