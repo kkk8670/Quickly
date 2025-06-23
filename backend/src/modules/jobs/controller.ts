@@ -7,7 +7,7 @@ import { z } from 'zod';
 const CreateJobSchema = z.object({
   type: z.enum(['QUICK_BOOK', 'POST_QUOTE']),
   customerId: z.string(),
-  details: z.string(),
+  title: z.string(),
 });
 
 // http post

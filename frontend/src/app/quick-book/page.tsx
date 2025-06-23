@@ -1,56 +1,47 @@
-// src/app/quick-book/page.tsx
 'use client';
-import React from 'react';
-import { useEffect, useState } from 'react';
+
+import { useState } from 'react';
 import { io } from 'socket.io-client';
 
-type Job = {
-    id: string;
-    type: string;
-    status: string;
-    customerId: string;
-    description: string;
-    createdAt: string;
-};
+const socket = io('http://localhost:3001', {
+    transports: ['websocket'],
+});
 
-export default function QuickBookPage() {
+const QuickBookPage = () => {
+    const [message, setMessage] = useState('');
+    const [title, setTitle] = useState('');
 
-    const [jobs, setJobs] = useState<Job[]>([]);
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!title) return;
 
-    useEffect(() => {
-        const socket = io('http://localhost:3001', {
-            transports: ['websocket'],
+        socket.emit('create-job', {
+            type: 'QUICK_BOOK',
+            customerId: 'cus_test',
+            title,
         });
 
-        socket.on('connect', () => {
-            console.log('Connected to WS server');
-        });
-
-        socket.on('new-job', (job: Job) => {
-            if (job.type === 'QUICK_BOOK') {
-                console.log('Received new job:', job);
-                setJobs((prev) => [job, ...prev]);
-            }
-        });
-
-        return () => {
-            socket.disconnect();
-        };
-    }, []);
+        setMessage('Submitted successfully!');
+        setTitle('');
+    };
 
     return (
-        <main className="p-4">
-            <h1 className="text-xl font-bold mb-4">Real-time book List</h1>
-            <ul className="space-y-2">
-                {jobs.map((job) => (
-                    <li key={job.id} className="p-3 border rounded shadow">
-                        <p> {job.id}</p>
-                        <p> Customer: {job.customerId}</p>
-                        <p> content: {job.description}</p>
-                        <p> time: {new Date(job.createdAt).toLocaleString()}</p>
-                    </li>
-                ))}
-            </ul>
-        </main>
+        <div className="p-4">
+            <h1 className="text-xl font-bold mb-2">appointment</h1>
+            <form onSubmit={handleSubmit}>
+                <input
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Please enter your requirements"
+                    className="border p-2 w-full "
+                />
+                <button type="submit" className="mt-2 bg-blue-500 text-white px-4 py-2 rounded">
+                    submit
+                </button>
+            </form>
+            {message && <p className="mt-2 text-green-600">{message}</p>}
+        </div>
     );
 }
+
+export default QuickBookPage
