@@ -4,7 +4,7 @@ import { CreateBidSchema } from './bid.schema.js';
 
 export const registerBidSocket = (io: Server) => {
   io.on('connection', (socket: Socket) => {
-    console.log('[Bid] WebSocket connected');
+    console.log(`[Bid] WebSocket connected at ${new Date().toISOString()}`, socket.id,);
 
     socket.on('create-bid', async (data) => {
       console.log('Received create-bid:', data);

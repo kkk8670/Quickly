@@ -4,6 +4,7 @@ import cors from '@fastify/cors'
 import fastifyIO from 'fastify-socket.io'
 import jobRoutes from './modules/jobs/job.routes.js'
 import { registerJobSocket } from './modules/jobs/job.socket.js';
+import bidRoutes from './modules/bids/bid.routes.js';
 import { registerBidSocket } from './modules/bids/bid.socket.js';
 
 const app = Fastify()
@@ -11,6 +12,7 @@ const app = Fastify()
 await app.register(cors)
 await app.register(fastifyIO.default);
 await app.register(jobRoutes)
+await app.register(bidRoutes);
 
 registerJobSocket(app.io);
 registerBidSocket(app.io);
