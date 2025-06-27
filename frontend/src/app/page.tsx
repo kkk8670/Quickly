@@ -1,15 +1,23 @@
 import Link from 'next/link';
+import ServiceTypeCards from '@/components/ServiceTypeCard';
+import QuickBookCard from '@/components/QuickBookCard';
+import PostQuoteCard from '@/components/PostQuoteCard';
 
 const HomePage = () => {
   return (
-    <main className="p-6">
-      <h1 className="text-2xl font-bold">Quickly Home</h1>
-      <div className="flex mt-4 flex-col underline text-blue-500">
-        <Link href="/quick-book"> Quick Book </Link>
-        <Link href="/post-job"> Post & Quote </Link>
-        <Link href="/job-board"> View Job Board </Link>
-      </div>
-    </main>
+    <div className="p-6">
+
+      <h2>Need Services? Choose what works best for you</h2>
+      <ServiceTypeCards>
+        <Link href="customer/quick-book" className="block">
+          <QuickBookCard />
+        </Link>
+        <Link href="customer/post-quote" className="block">
+          <PostQuoteCard />
+        </Link>
+      </ServiceTypeCards>
+
+    </div>
   );
 }
 

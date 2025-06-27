@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify'
-import { getJobsHandler, createJobHandler } from './controller.js'
+import { getJobsHandler, createJobHandler } from './job.controller.js'
 
 
 const jobRoutes = async (app: FastifyInstance) => {
