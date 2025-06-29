@@ -40,13 +40,20 @@ export default function PostQuotePage() {
         budgetRange: [10, 100],
     });
     useEffect(() => {
-        const saved = localStorage.getItem('quote-draft');
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                setFormData((prev) => ({ ...prev, ...parsed }));
-            } catch (e) {
-                console.error('Failed to parse saved post quote form data:', e);
+        const navEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+        const navType = navEntries[0]?.type;
+
+        if (navType !== 'back_forward') {
+            sessionStorage.removeItem('quote-draft');
+        } else {
+            const saved = sessionStorage.getItem('quote-draft');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    setFormData((prev) => ({ ...prev, ...parsed }));
+                } catch (e) {
+                    console.error('Failed to parse saved post quote form data:', e);
+                }
             }
         }
     }, []);
@@ -54,7 +61,7 @@ export default function PostQuotePage() {
     const handleChange = (field: keyof PostQuoteFormData, value: any) => {
         const updated = { ...formData, [field]: value };
         setFormData(updated);
-        localStorage.setItem('quote-draft', JSON.stringify(updated));
+        sessionStorage.setItem('quote-draft', JSON.stringify(updated));
     };
 
 
@@ -173,9 +180,10 @@ export default function PostQuotePage() {
                     renderTrack={({ props, children }) => {
                         const [minVal, maxVal] = formData.budgetRange;
                         const percentage = ((maxVal - BUDGET_SETTING.MIN) / (BUDGET_SETTING.MAX - BUDGET_SETTING.MIN)) * 100;
+                        const { ...rest } = props;
                         return (
                             <div
-                                {...props}
+                                {...rest}
                                 className="h-2 w-full rounded bg-gray-200"
                                 style={{ position: 'relative' }}
                             >
@@ -193,12 +201,16 @@ export default function PostQuotePage() {
                             </div>
                         );
                     }}
-                    renderThumb={({ props }) => (
-                        <div
-                            {...props}
-                            className="w-4 h-4 bg-blue-500 rounded-full shadow border border-white"
-                        />
-                    )}
+                    renderThumb={({ props }) => {
+                        const { key, ...rest } = props;
+                        return (
+                            <div
+                                key={key}
+                                {...rest}
+                                className="w-4 h-4 bg-blue-500 rounded-full shadow border border-white"
+                            />
+                        );
+                    }}
                 />
 
                 <div className="text-sm text-gray-700">

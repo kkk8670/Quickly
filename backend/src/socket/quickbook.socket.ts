@@ -18,6 +18,7 @@ type Provider = {
 const connectedUsers = getConnectedUsers();
 
 const registerQuickBookHandler = (socket: Socket) => {
+    console.log('[backend] RegisterQuickBookHandler bound to socket:', socket.id);
     socket.on("register", (userId: string) => {
         connectedUsers.set(userId, socket);
         console.log(`User registered: ${userId}`);
@@ -41,6 +42,8 @@ registerQuickBookHandler.notifyCustomer = (customerId: string, event: string, da
     if (socket) {
         socket.emit(event, data);
     }
+    console.log('[notifyCustomer] customerId:', customerId);
+    console.log('[notifyCustomer] connectedUsers keys:', [...connectedUsers.keys()]);
 };
 
 registerQuickBookHandler.notifyOtherProviders = (jobId: string, selectedProviderId: string, event: string) => {
@@ -111,4 +114,6 @@ registerQuickBookHandler.broadcastQuickBook = async (job: JobDTO) => {
 };
 
 
+
 export default registerQuickBookHandler;
+
