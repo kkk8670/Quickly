@@ -1,0 +1,31 @@
+{
+    "compilerOptions": {
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "target": "ES2022",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "baseUrl": "./src",
+        "paths": {
+            "@/*": [
+                "*"
+            ]
+        },
+        "outDir": "./dist",
+        "skipLibCheck": true,
+    },
+    "include": [
+        "next-env.d.ts",
+        "**/*.ts",
+        "**/*.tsx",
+        ".next/types/**/*.ts",
+        "plugins",
+        "src/**/*",
+        "types/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}

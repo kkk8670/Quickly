@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: quickly
+      POSTGRES_PASSWORD: quickly
+      POSTGRES_DB: quickly
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: . 
+      dockerfile: backend/Dockerfile
+    # command: pnpm dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://quickly:quickly@db:5432/quickly
+    depends_on:
+      - db
+
+  frontend:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    # command: pnpm dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
