@@ -1,22 +1,25 @@
 import { prisma } from '@/lib/prisma.js';
 
 async function main() {
-    await prisma.job.createMany({
-        data: [
-            {
-                type: 'QUICK_BOOK',
-                title: 'Fix AC urgently',
-                lat: 1.3521,
-                lng: 103.8198,
-            },
-            {
-                type: 'POST_QUOTE',
-                title: 'Clean 3-room apartment',
-                lat: 1.3521,
-                lng: 103.8198,
-            },
-        ],
+    await prisma.user.upsert({
+        where: { id: 'customer_001' },
+        update: {},
+        create: {
+            id: 'customer_001',
+            name: 'Demo Customer',
+            email: 'demo@example.com',
+            password: 'demo1234',
+            type: 'CUSTOMER',
+        },
     });
 }
 
-main().finally(() => prisma.$disconnect());
+main()
+    .then(() => {
+        console.log('✅ Seeded demo user');
+        prisma.$disconnect();
+    })
+    .catch((e) => {
+        console.error(e);
+        prisma.$disconnect();
+    });

@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import useJobStore from '@/stores/jobStore'
+import {useJobStore} from '@/stores/jobStore'
 import { useSocket } from '@/hooks/useSocket';
 import { JobInfoCard, StatusCard, InfoRow } from '@/components/BookStatusCard'
 import type { Job } from '@/types'
@@ -25,7 +25,9 @@ const mockJob = {
 
 export default function QuickBookWaitingPage() {
     const router = useRouter();
-    const params = useParams()
+    const socket = useSocket();
+    const params = useParams();
+    const jobId = params.jobId
     // const { job } = useJobStore();
     // const [job, setJob] = useState(mockJob);
     const [job, setJob] = useState<Job | null>(null);
@@ -33,9 +35,8 @@ export default function QuickBookWaitingPage() {
     const [status, setStatus] = useState('waiting');
     const [matchedProvider, setMatchedProvider] = useState<Provider | null>(null);
     const [socketReady, setSocketReady] = useState(false);
-
-    const jobId = params.jobId
-    const socket = useSocket();
+    
+    
 
     useEffect(() => {
         if (!jobId) return;

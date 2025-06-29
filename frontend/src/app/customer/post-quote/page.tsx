@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { getCoordfromAddr } from '@/utils/commonFunc'
+import { getCoordfromAddr, getTimeRangeFromOption } from '@/utils/commonFunc'
 import { SERVICE_CATEGORIES, TimePreference } from '@/lib/constants'
 import type { TimeExpection } from '@/types'
 import { Range } from 'react-range';
@@ -30,6 +30,7 @@ const BUDGET_SETTING = {
 
 export default function PostQuotePage() {
     const router = useRouter();
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState<PostQuoteFormData>({
         serviceType: '',
         description: '',
@@ -38,34 +39,58 @@ export default function PostQuotePage() {
         timeOption: 'flexible',
         budgetRange: [10, 100],
     });
+    useEffect(() => {
+        const saved = localStorage.getItem('quote-draft');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                setFormData((prev) => ({ ...prev, ...parsed }));
+            } catch (e) {
+                console.error('Failed to parse saved post quote form data:', e);
+            }
+        }
+    }, []);
 
     const handleChange = (field: keyof PostQuoteFormData, value: any) => {
-        setFormData((prev) => ({ ...prev, [field]: value }));
+        const updated = { ...formData, [field]: value };
+        setFormData(updated);
+        localStorage.setItem('quote-draft', JSON.stringify(updated));
     };
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const coords = await getCoordfromAddr(formData.address);
         const payload = {
-            ...formData,
-            coordinates: coords,
+            serviceType: formData.serviceType,
+            description: formData.description,
+            address: formData.address,
+            coordinates: getCoordfromAddr(formData.address),
+            timeRange: getTimeRangeFromOption(formData.timeOption),
+            budgetRange: formData.budgetRange
         };
 
-        const query = new URLSearchParams({
-            serviceType: payload.serviceType,
-            description: payload.description,
-            address: payload.address,
-            timeOption: payload.timeOption,
-            budgetRange: payload.budgetRange.join(','),
-            coordinates: payload.coordinates.join(','),
-        }).toString();
-
-        router.push(`/post-quote/confirm?${query}`);
-    };
-
-    const handleTestClick = () => {
-        router.push('/post-quote/waiting');
+        setLoading(true);
+        try {
+            const res = await fetch('http://localhost:3001/api/jobs/post-quote/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const result = await res.json();
+            console.log('jobId from backend:', result);
+            if (result.success) {
+                router.push(`/customer/post-quote/${result.jobId}/bidding`);
+            } else {
+                alert('booking failed: ' + result.error);
+            }
+        }
+        catch (error) {
+            alert('fail');
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -190,7 +215,6 @@ export default function PostQuotePage() {
             >
                 Post a Request - Start Receiving Quotes
             </button>
-
         </form>
     );
 }

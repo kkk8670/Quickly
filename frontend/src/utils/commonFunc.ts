@@ -7,7 +7,7 @@ export const getTimeRangeFromSlot = (slotKey: string): [string, string] => {
         case 'now':
             return [
                 now.toISOString(),
-                new Date(now.getTime() + 2 * 60 * 60 * 1000).toISOString(), // +2小时
+                new Date(now.getTime() + 2 * 60 * 60 * 1000).toISOString(), // +2h
             ];
         case 'moring':
             return [
@@ -32,6 +32,31 @@ export const getTimeRangeFromSlot = (slotKey: string): [string, string] => {
     }
 }
 
+export const getTimeRangeFromOption = (option: string): [string, string] => {
+    const now = new Date();
+    const startTime = new Date(now);
+    const endTime = new Date(now);
+
+    switch (option) {
+        case 'asap':
+            endTime.setHours(23, 59, 59, 999);
+            break;
+        case 'this_week':
+            const day = now.getDay();
+            const daysUntilSunday = 7 - day;
+            endTime.setDate(endTime.getDate() + daysUntilSunday);
+            endTime.setHours(23, 59, 59, 999);
+            break;
+        case 'flexible':
+            endTime.setDate(endTime.getDate() + 7);
+            endTime.setHours(23, 59, 59, 999);
+            break;
+    }
+    return [
+        startTime.toISOString(),
+        endTime.toISOString()
+    ]
+}
 
 
 export const getCoordfromAddr = (key: string) => {

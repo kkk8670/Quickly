@@ -67,8 +67,10 @@ export interface Provider {
 export type Bid = {
     id: string;
     price: number;
+    estimatedTime: string;
     message: string | null;
-    provider: Provider;
+    providerName: string;
+    providerRating: number | null;
     jobId: string;
     createdAt: string;
 };

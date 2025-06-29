@@ -1,11 +1,12 @@
 import { io, Socket } from 'socket.io-client';
 import { useEffect, useRef } from 'react';
-import useJobStore from '@/stores/jobStore';
+import { useJobStore } from '@/stores/jobStore';
 import type { Job } from '@/types'
 
 
 export const socket = io('http://localhost:3001', {
-  transports: ['websocket']
+  // transports: ['websocket'],
+  autoConnect: false,
 });
 
 // export const useSocket = (userId: string | null) => {

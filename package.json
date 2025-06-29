@@ -9,6 +9,11 @@
     "docker:up": "docker-compose up --build",
     "docker:down": "docker-compose down"
   },
+  "pnpm": {
+    "overrides": {
+      "fastify-cors": "npm:@empty/empty@0.0.1"
+    }
+  },
   "keywords": [],
   "author": "Chloe",
   "license": "ISC",

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getTimeRangeFromSlot, getCoordfromAddr } from '@/utils/commonFunc'
 import { SERVICE_CATEGORIES, TIME_SLOTS } from '@/lib/constants'
-import useJobStore from '@/stores/jobStore'
+import { useJobStore } from '@/stores/jobStore'
 
 
 const QuickBookPage = () => {
@@ -16,14 +16,6 @@ const QuickBookPage = () => {
     const [price, setPrice] = useState('');
     const { setCurrentJob } = useJobStore();
     const [loading, setLoading] = useState(false);
-
-    // const getCategoryLabel = (key: string) => {
-    //     return SERVICE_CATEGORIES.find((c) => c.key === key)?.label || '';
-    // };
-
-    // const getTimeSlotLabel = (key: string) => {
-    //     return TIME_SLOTS.find((t) => t.key === key)?.label || '';
-    // };
 
     useEffect(() => {
         const saved = localStorage.getItem('quickBookDraft');
@@ -65,7 +57,7 @@ const QuickBookPage = () => {
 
             if (result.success) {
                 setCurrentJob({ id: result.jobId, status: 'PENDING' });
-                router.push(`/customer/quick-book/waiting/${result.jobId}`);
+                router.push(`/customer/quick-book/${result.jobId}/waiting`);
             } else {
                 alert('booking failed: ' + result.error);
             }
