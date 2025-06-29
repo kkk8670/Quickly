@@ -2,10 +2,13 @@ import { JobDTO, CreateQuickBookSchema } from '@/models/schema.js'
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { createQuickBookJob } from '@/services/quickbook.service.js'
 import { getJobById } from '@/repositories/job.repository.js';
+import { Server } from 'socket.io';
+
 
 export const createAndMatch = async (
     req: FastifyRequest,
-    res: FastifyReply
+    res: FastifyReply,
+    io: Server
 ) => {
     console.log('qb-controller: Received POST /quick-book/create');
     console.log('Body:', req.body);
@@ -29,9 +32,9 @@ export const createAndMatch = async (
             customerId: 'customer_001'
         };
 
-        const createdJob = await createQuickBookJob(payload);
+        const createdJob = await createQuickBookJob(payload, io);
         // await socketService.broadcastQuickBook(createdJob);
-        console.log('create Job', createdJob)
+        // console.log('create Job', createdJob)
 
         return res.send({
             success: true,

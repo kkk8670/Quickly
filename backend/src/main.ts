@@ -4,6 +4,8 @@ import cors from '@fastify/cors'
 import fastifyIO from 'fastify-socket.io'
 import registerAllRoutes from './routes/registerRoutes.js'
 import registerSocketHandlers from './socket/registerHandlers.js'
+import { setIO } from './socket/socketState.js'
+
 
 const app = Fastify({ logger: true })
 
@@ -20,9 +22,10 @@ await app.register(fastifyIO.default, {
     },
 });
 
-await registerAllRoutes(app);
+await registerAllRoutes(app, app.io);
 
 app.ready().then(() => {
+    setIO(app.io);
     registerSocketHandlers(app.io)
     console.log('✅ WebSocket handlers registered.')
 })

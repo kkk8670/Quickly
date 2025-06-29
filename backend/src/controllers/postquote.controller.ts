@@ -1,12 +1,13 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { JobDTO, CreatePostQuoteSchema } from '@/models/schema.js'
 import { createPostQuoteJob, updatePostQuoteJob } from '@/services/postquote.service.js'
-import { getJobById } from '@/repositories/job.repository.js';
-
+import registerPostQuoteHandler from '@/socket/postquote.socket.js'
+import { Server } from 'socket.io';
 
 export const createAndPidding = async (
     req: FastifyRequest,
-    res: FastifyReply
+    res: FastifyReply,
+    io: Server
 ) => {
     console.log('qb-controller: Received POST /post-quote/create');
     console.log('Body:', req.body);
@@ -33,9 +34,9 @@ export const createAndPidding = async (
             price: 0
         };
 
-        const createdJob = await createPostQuoteJob(payload);
-        // await socketService.broadcastQuickBook(createdJob);
-        console.log('create Job', createdJob)
+        const createdJob = await createPostQuoteJob(payload, io);
+
+        // console.log('create Job', createdJob)
 
         return res.send({
             success: true,
@@ -43,7 +44,7 @@ export const createAndPidding = async (
         });
 
     } catch (error) {
-        console.error('createAndMatch error:', error);
+        console.error('createAndPidding error:', error);
         return res.status(500).send({
             success: false,
             error: error instanceof Error ? error.message : 'Unknown error',
@@ -73,4 +74,32 @@ export const getPostQuoteOrder = async (
         console.error(err);
         res.status(500).send({ success: false, error: 'Internal Server Error' });
     }
+}
+
+
+export const mockBidQuote = async (
+    req: FastifyRequest,
+    res: FastifyReply
+) => {
+    const { jobId, budgetRange } = req.body as {
+        jobId: string;
+        budgetRange: number[]
+    };
+    const [min, max] = budgetRange;
+    console.log('[MOCK BID] jobId:', jobId);
+    const fakeBid = {
+        id: crypto.randomUUID(),
+        providerName: `Provider ${Math.floor(Math.random() * 10 + 1)}`,
+        rating: parseFloat((Math.random() * 1.5 + 3.5).toFixed(1)),
+        message: 'We can finish this fast!',
+        estimatedTime: `${Math.floor(Math.random() * 5 + 1)} days`,
+        price: Math.floor(Math.random() * (max - min + 1)) + min,
+    };
+    console.log('here is fakebid', jobId)
+    registerPostQuoteHandler.broadcastPostQuote({
+        jobId,
+        payload: fakeBid
+    });
+    console.log('[MOCK BID] return:', fakeBid);
+    return res.send({ status: 'ok', sent: fakeBid });
 }

@@ -9,7 +9,6 @@ import { useJobStore } from '@/stores/jobStore'
 
 const QuickBookPage = () => {
     const router = useRouter();
-    const [step, setStep] = useState(1);
     const [category, setCategory] = useState('');
     const [timeSlot, setTimeSlot] = useState('');
     const [address, setAddress] = useState('');
@@ -18,7 +17,8 @@ const QuickBookPage = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        const saved = localStorage.getItem('quickBookDraft');
+        const saved = sessionStorage.getItem('quote-draft');
+        console.log('[page1] draft loaded', saved);
         if (saved) {
             const parsed = JSON.parse(saved);
             setCategory(parsed.category || '');
@@ -30,7 +30,7 @@ const QuickBookPage = () => {
 
     useEffect(() => {
         const data = { category, timeSlot, address, price };
-        localStorage.setItem('quickBookDraft', JSON.stringify(data));
+        sessionStorage.setItem('quote-draft', JSON.stringify(data));
     }, [category, timeSlot, address, price]);
 
     const handleSubmit = async () => {
