@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { socket } from '@/lib/socket';
+import { socket } from '@/hooks/useSocket';
 
 const SubmitBidPage = ({ searchParams }: { searchParams?: { jobId?: string } }) => {
     const jobIdFromQuery = searchParams?.jobId || '';
@@ -85,7 +85,7 @@ const SubmitBidPage = ({ searchParams }: { searchParams?: { jobId?: string } }) 
                     ))}
                 </select>
             )}
-            
+
             <input
                 type="number"
                 placeholder="Bid amount"

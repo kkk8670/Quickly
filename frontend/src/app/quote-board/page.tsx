@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { Job } from '@/types'
-import { socket } from '@/lib/socket';
+import { socket } from '@/hooks/useSocket';
 
 const QuoteBoardPage = () => {
     const [jobs, setJobs] = useState<Job[]>([]);
@@ -36,7 +36,7 @@ const QuoteBoardPage = () => {
                 {jobs.map(job => (
                     <li key={job.id} className="p-4 border rounded shadow">
                         <h2 className="text-lg font-semibold">
-                            {job.title}
+                            {job.serviceType}
                         </h2>
                         <div className="text-sm text-gray-500">
                             <strong>Created At:</strong>

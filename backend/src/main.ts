@@ -2,20 +2,33 @@
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import fastifyIO from 'fastify-socket.io'
-import jobRoutes from './modules/jobs/job.routes.js'
-import { registerJobSocket } from './modules/jobs/job.socket.js';
-import bidRoutes from './modules/bids/bid.routes.js';
-import { registerBidSocket } from './modules/bids/bid.socket.js';
+import registerAllRoutes from './routes/registerRoutes.js'
+import registerSocketHandlers from './socket/registerHandlers.js'
 
-const app = Fastify()
+const app = Fastify({ logger: true })
 
-await app.register(cors)
-await app.register(fastifyIO.default);
-await app.register(jobRoutes)
-await app.register(bidRoutes);
+await app.register(cors, {
+    origin: ['http://localhost:3000'],
+    credentials: true,
+});
 
-registerJobSocket(app.io);
-registerBidSocket(app.io);
+await app.register(fastifyIO.default, {
+    cors: {
+        origin: ['http://localhost:3000'],
+        methods: ['GET', 'POST'],
+        credentials: true,
+    },
+});
+
+await registerAllRoutes(app);
+
+app.ready().then(() => {
+    registerSocketHandlers(app.io)
+    console.log('✅ WebSocket handlers registered.')
+})
+
+console.log("app.routes:", app.printRoutes());
+
 
 await app.listen({ port: 3001, host: '0.0.0.0' })
 console.log('Backend running on http://localhost:3001')

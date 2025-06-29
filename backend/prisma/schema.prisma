@@ -9,17 +9,31 @@ datasource db {
 
 
 model Job {
-  id           String   @id @default(uuid())
-  type         JobType
-  status       JobStatus   @default(PENDING)
-  title        String?
-  description  String?
-  customerId   String?
-  lat          Float?
-  lng          Float?
-  bids         Bid[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              String   @id @default(uuid())
+  type            JobType
+  status          JobStatus   @default(PENDING)
+  serviceType     String
+  price           Float?
+  description     String?
+  address         String?
+  lat             Float?
+  lng             Float?
+  bids            Bid[]
+  jobStartTime    DateTime
+  jobEndTime      DateTime?
+  selectedBidId   String?
+  autoAcceptPrice Float?
+  budgetMin       Float?
+  budgetMax       Float?
+
+  customerId      String
+  customer        User      @relation("CustomerJobs", fields: [customerId], references: [id])
+
+  providerId      String?
+  provider        User?     @relation("ProviderJobs", fields: [providerId], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 enum JobType {
@@ -30,16 +44,43 @@ enum JobType {
 enum JobStatus {
   PENDING
   BOOKED
+  MATCHED
   COMPLETED
   CANCELLED
 }
 
+
 model Bid {
-  id        String   @id @default(uuid())
-  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  jobId     String
-  providerId String
-  amount    Float
-  message   String?
-  createdAt DateTime @default(now())
+  id          String   @id @default(uuid())
+  job         Job      @relation(fields: [jobId], references: [id], onDelete:   Cascade)
+  jobId       String
+  providerId  String
+  status      JobStatus   @default(PENDING)
+  price       Float
+  message     String?
+  createdAt   DateTime @default(now())
+}
+
+enum UserType {
+  CUSTOMER
+  PROVIDER
+}
+
+model User {
+  id          String    @id @default(uuid())
+  name        String
+  email       String    @unique
+  password    String
+  type        UserType
+ 
+  skills      String?  
+  rating      Float?
+  locationLat Float?
+  locationLng Float?
+ 
+  jobsAsCustomer Job[]  @relation("CustomerJobs")
+  jobsAsProvider Job[]  @relation("ProviderJobs")
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
