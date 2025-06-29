@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { socket } from '@/hooks/useSocket';
+import { useSocket } from '@/hooks/useSocket';
 import { useRouter, useParams } from 'next/navigation';
 import type { Bid } from '@/types'
 import { useBidsStore, useSelectedBidStore } from '@/stores/jobStore'
@@ -11,6 +11,7 @@ const PostQuoteBidding = () => {
     const params = useParams();
     const jobId = params.jobId
     const router = useRouter();
+    const socket = useSocket();
     // const [bids, setBids] = useState<Bid[]>([]);
     const { bids, appendBid } = useBidsStore()
     const [currentRound, setCurrentRound] = useState(0);
@@ -18,12 +19,15 @@ const PostQuoteBidding = () => {
     const [autoAcceptEnabled, setAutoAcceptEnabled] = useState(false);
     const { setSelectedBid } = useSelectedBidStore();
 
+    const savedFormString = sessionStorage.getItem('quote-draft');
+    const savedForm = savedFormString ? JSON.parse(savedFormString) : null;
     const geneMockBids = async () => {
+
         console.log('[Click] Trying to generate fake bid');
         await fetch('http://localhost:3001/api/jobs/post-quote/mock-bid', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ jobId }),
+            body: JSON.stringify({ jobId: jobId, budgetRange: savedForm.budgetRange }),
         });
     }
 
@@ -57,7 +61,7 @@ const PostQuoteBidding = () => {
             console.log('[Socket] Attempting to connect...');
             socket.connect();
         }
-
+        console.log('Emitting join_room', jobId);
         socket.emit('join_room', { jobId });
 
         // socket.on('new_bid', (bid) => {

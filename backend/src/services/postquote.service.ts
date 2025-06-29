@@ -2,7 +2,7 @@ import { Job } from '@prisma/client'
 import { createJobInDB, updateJobInBD } from '@/repositories/job.repository.js'
 import { JobSchema, JobDTO } from '@/models/schema.js'
 import { Server } from 'socket.io';
-
+import registerPostQuoteHandler from '@/socket/postquote.socket.js'
 
 // import socketService from '@/services/socket.postquote.js'
 
@@ -23,8 +23,9 @@ export const updatePostQuoteJob = async (
 ): Promise<Job> => {
 
     const job = await updateJobInBD(jobId, updateData);
-    // if (io) {
-    //     io.emit('job_updated', job);  
-    // }
+    // await registerPostQuoteHandler.broadcastPostQuote(job);
+
     return job;
 }
+
+

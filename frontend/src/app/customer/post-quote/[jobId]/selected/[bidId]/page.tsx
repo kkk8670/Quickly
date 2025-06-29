@@ -31,6 +31,7 @@ const PostQuoteSelected = () => {
       if (!res.ok) {
         throw new Error('Failed to confirm bid');
       }
+      sessionStorage.removeItem('quote-draft')
       router.push(`/customer/post-quote/${jobId}/completed`);
     } catch (error) {
       console.error('Selection failed:', error);

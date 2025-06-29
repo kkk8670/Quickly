@@ -4,8 +4,7 @@
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
-import {useJobStore} from '@/stores/jobStore'
+import { useJobStore } from '@/stores/jobStore'
 import { useSocket } from '@/hooks/useSocket';
 import { JobInfoCard, StatusCard, InfoRow } from '@/components/BookStatusCard'
 import type { Job } from '@/types'
@@ -35,18 +34,18 @@ export default function QuickBookWaitingPage() {
     const [status, setStatus] = useState('waiting');
     const [matchedProvider, setMatchedProvider] = useState<Provider | null>(null);
     const [socketReady, setSocketReady] = useState(false);
-    
-    
+
 
     useEffect(() => {
         if (!jobId) return;
-
         fetchJobDetails();
     }, [jobId]);
 
+
+
     useEffect(() => {
         if (!socket) return;
-
+        console.log('[debug] effect called with socket:', socket);
         const handleConnect = () => {
             setSocketReady(true);
         };
@@ -59,6 +58,9 @@ export default function QuickBookWaitingPage() {
         socket.on('connect_error', handleError);
         socket.on('connect_timeout', handleError);
 
+        if (socket.connected) {
+            setSocketReady(true);
+        }
         return () => {
             socket.off('connect', handleConnect);
             socket.off('connect_error', handleError);
@@ -67,7 +69,10 @@ export default function QuickBookWaitingPage() {
     }, [socket]);
 
     useEffect(() => {
-        if (!jobId || !socket) return;
+        if (!jobId || !socketReady || !socket) {
+            console.log('[debug] Not ready for events or countdown:', { jobId, socketReady, socket });
+            return;
+        }
         const handleMatched = (data: any) => {
             console.log('[socket] matched event received', data);
             if (data.jobId === jobId) {
@@ -86,22 +91,26 @@ export default function QuickBookWaitingPage() {
         };
         socket.on('job_timeout', handleTimeout);
 
-        const timer = setInterval(() => {
-            setCountdown(prev => {
-                if (prev <= 1) {
-                    setStatus('timeout');
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
+        let timer: NodeJS.Timeout;
+        if (status === 'waiting') {
+            timer = setInterval(() => {
+                setCountdown(prev => {
+                    if (prev <= 1) {
+                        setStatus('timeout');
+                        clearInterval(timer);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        }
 
         return () => {
-            clearInterval(timer);
+            if (timer) clearInterval(timer);
             socket.off('job_matched', handleMatched);
             socket.off('job_timeout', handleTimeout);
         };
-    }, [jobId, socket]);
+    }, [jobId, socketReady, socket, status]);
 
     const fetchJobDetails = async () => {
         try {
@@ -126,6 +135,13 @@ export default function QuickBookWaitingPage() {
         }
     };
 
+    useEffect(() => {
+        if (!socket) return;
+        const customerId = 'customer_001';
+        socket.emit('register', customerId);
+        console.log('[frontend] register emitted with customerId:', customerId);
+    }, [socket]);
+
     const formatTime = (seconds: number) => {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = seconds % 60;
@@ -136,7 +152,9 @@ export default function QuickBookWaitingPage() {
     // const handleTestClick = () => {
     //     router.push('/quick-book/confirmed');
     // };
-
+    const handleBack = () => {
+        router.back();
+    };
 
     return (
         <div className="container mx-auto p-4 max-w-md space-y-6">
@@ -170,15 +188,18 @@ export default function QuickBookWaitingPage() {
                 {status === 'timeout' && (
                     <StatusCard icon="⏰" title="No provider available for now" color="red">
                         <p className="text-gray-600 mb-4">Please try again later or adjust your requirements.</p>
-                        <button
-                            onClick={() => router.push('/customer/quick-book')}
-                            className="bg-blue-600 text-white px-6 py-2 rounded-xl hover:bg-blue-700"
-                        >
-                            Rebook
-                        </button>
+
                     </StatusCard>
                 )}
             </>)}
+            <div className="flex justify-center">
+                <button
+                    onClick={handleBack}
+                    className="bg-blue-600 text-white px-6 py-2 rounded-xl hover:bg-blue-700"
+                >
+                    Rebook
+                </button>
+            </div>
         </div>
     );
 }
